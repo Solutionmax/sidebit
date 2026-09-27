@@ -1,0 +1,10 @@
+name: macOS checks
+on: [push, pull_request]
+jobs:
+  native:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: ./scripts/build-app.sh
+      - run: python3 scripts/smoke-hooks.py dist/Sidebit.app

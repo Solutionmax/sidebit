@@ -1,0 +1,24 @@
+name: Bug report
+description: Something Bit did (or didn't do) that looks wrong
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Please never paste credentials, prompts, transcripts or the contents of your agent settings files.
+  - type: input
+    id: version
+    attributes: { label: Sidebit version, placeholder: "0.6.0 (Settings footer)" }
+    validations: { required: true }
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      multiple: true
+      options: [Claude Code CLI, Claude Code in an IDE, Claude Desktop, Codex CLI, Codex app, Codex IDE extension]
+  - type: input
+    id: macos
+    attributes: { label: macOS version and Mac model, placeholder: "macOS 15.3, MacBook Air M2" }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: "What did you expect Bit to do instead?" }
+    validations: { required: true }

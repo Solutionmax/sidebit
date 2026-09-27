@@ -1,0 +1,383 @@
+{
+  "scenes": [
+    {
+      "scene": "working",
+      "loop": true,
+      "seconds": 9.5,
+      "prompts": {},
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          168,
+          60,
+          472,
+          396
+        ],
+        "contentSize": [
+          440,
+          370
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0.5,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "thinking",
+      "loop": true,
+      "seconds": 9.5,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit is seated behind his open graphite laptop. ONE tiny yellow voxel rubber duck sits firmly on the left front corner of the laptop keyboard base, clearly resting on the solid laptop surface. Neither pincer holds the duck. Both pincers rest beside the laptop, one close to his chin. Puzzled thoughtful eyebrows. Keep the duck a little object on the keyboard base, not on top of the screen, not floating. Entire character and laptop visible. No other props.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: The yellow rubber duck remains completely stationary, firmly resting on the laptop keyboard base throughout. Bit peers down at this tiny duck as if asking his senior developer a question. He tilts his head a little left, raises one eyebrow, pauses thoughtfully, then slowly nods and smiles as if the duck has solved everything. One free pincer makes a small conversational gesture close to his chest and returns to rest. One natural blink. Character body, laptop and duck stay in their exact starting locations; movement is only head, expression and one pincer. No touching, picking up or moving the duck. End in the initial thoughtful posture. Gentle, subtle, believable toy animation.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          160,
+          58,
+          480,
+          400
+        ],
+        "contentSize": [
+          440,
+          366
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0.5,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "waiting",
+      "loop": true,
+      "seconds": 9.5,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit stands beside his CLOSED graphite laptop, one pincer raised in a small polite wave, other pincer loosely in front of his belly. Hopeful warm face, eyebrows raised slightly. Full body and both little feet visible. No other props.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: 0-3 seconds: a small friendly wave with his raised pincer, independent elbow and wrist movement, hopeful eyebrows. 3-5 seconds: lower the arm and patiently rock once from one little foot to the other, looking toward the viewer. 5-7 seconds: shyly raise just the pincer again, a little smaller this time, as if saying excuse me. 7-10 seconds: slight friendly head tilt, blink, return to the initial polite raised-hand pose. Gentle, welcoming and never angry or panicked. Closed laptop stays stationary; no jumping, no running away.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          96,
+          16,
+          544,
+          440
+        ],
+        "contentSize": [
+          440,
+          356
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0.5,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "done",
+      "loop": false,
+      "seconds": 10,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit stands proudly beside his CLOSED graphite laptop, holding ONE small gold trophy with two handles and no markings in his left pincer. Right pincer on his hip. A confident happy pixel smile. Both feet on the invisible ground, entire body and trophy visible. No other props.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: Bit stays seated behind the exact stationary laptop throughout the entire shot. He holds the small gold trophy firmly in one pincer at chest height. With both feet planted, he slowly lifts the trophy ONLY A LITTLE, no higher than his eyebrows, looks at it proudly, gives the viewer a cheeky small wink, then gently hugs the trophy close to his chest. A tiny satisfied head nod and smug smile finish the scene. His other pincer remains near his belly. No jumping, no dancing, no stepping, no bow, no turns of his body, no camera movement. Laptop and character remain fixed in place and at the exact same scale. Trophy never leaves his pincer and never changes shape. Small precise affectionate acting, full character stays centered with large empty margins.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          90,
+          50,
+          550,
+          406
+        ],
+        "contentSize": [
+          440,
+          324
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "idle",
+      "loop": true,
+      "seconds": 9.5,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit is seated, peacefully dozing with his cheek and one pincer resting on his CLOSED graphite laptop like a pillow. Other pincer hugs the laptop gently. Sleepy curved closed pixel eyes, tiny contented smile, two feet tucked beside him. No other props.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: 0-4 seconds: very gentle sleepy breathing, head and shoulders rise and fall a little independently, pincers relaxed on the laptop. 4-6 seconds: one tiny sleepy hiccup makes his head bob up; eyes open halfway in mild confusion, his free pincer rubs his cheek once. 6-10 seconds: he settles his cheek back on the laptop and drifts back to sleep with a small smile. Ends in the same original sleeping posture. Quiet sweet physical comedy, no startled jump or speaking. Laptop never changes shape or opens. No printed Zs or symbols.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          170,
+          56,
+          450,
+          400
+        ],
+        "contentSize": [
+          440,
+          392
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0.5,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "coffee",
+      "loop": false,
+      "seconds": 10,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit stands next to his CLOSED graphite laptop, carefully supporting a precarious vertical stack of THREE small white espresso mugs with both orange pincers. Mugs have tiny handles and no markings; stack stays below the top of his head. A worried but determined pixel face, full body and feet visible. No other props, no floating coffee drops.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: Bit stays seated behind the stationary laptop. The stack of three white cups stays perfectly rigid, whole and stationary in his pincer at its exact starting height throughout. No wobbling cups, no airborne cups, no spoons, no liquid. Only his face and free pincer move: wide worried eyes look up at the stack, then toward the viewer. His free pincer slowly approaches the base of the stack to help support it, then his eyebrows relax into a relieved little smile. One slow blink and tiny satisfied nod. Both feet remain planted. Keep the complete stack, laptop, body and pincers within the frame, never raise anything. Tiny restrained acting, stable geometry, no new props. End holding the stack safely with a proud gentle smile.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          164,
+          34,
+          476,
+          422
+        ],
+        "contentSize": [
+          440,
+          390
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    },
+    {
+      "scene": "unknown",
+      "loop": true,
+      "seconds": 9.5,
+      "prompts": {
+        "reference": {
+          "model": "nano-pro-edit",
+          "prompt": "Use the supplied reference image as the exact identity and rendering-style reference for Bit: the same adorable orange blocky voxel crab creature, square head/body, stepped orange edges, two glossy black rectangular pixel eyes, small pixel smile, TWO orange pincers on two jointed arms, TWO little feet. Preserve his proportions, orange color and soft clay-toy material. Create ONE isolated character in ONE scene, not a collage. Same fixed slightly raised front three-quarter camera angle as the reference. Entire body and all props fully visible with generous empty margins, character fills about 65 percent of the image. All props rest on the same invisible ground. Flat perfectly uniform chroma-key bright green #00FF00 background everywhere, no floor line, no gradient, no cast shadow on background, no green spill onto Bit. Soft constant studio lighting on character. No text, no logos, no watermark, no decorative symbols. SCENE: Bit sits beside his CLOSED graphite laptop, holding the loose end of one short dark charcoal USB cable in his left pincer. The cable connects to the side of the laptop and its unplugged end is clearly visible. Right pincer slightly open, curious puzzled face. No electricity, no lights, no symbols or text, no other props.",
+          "params": {
+            "resolution": "1K",
+            "num_images": 1,
+            "output_format": "png"
+          }
+        },
+        "video": {
+          "model": "kling25-i2v",
+          "prompt": "A single locked-off camera shot of the exact original orange voxel crab character Bit from the reference. Genuine independent articulated pincer, elbow, head and eye movement, not movement of a still image. Preserve his exact blocky toy design, two arms, two pincers, two feet, orange palette, laptop and named props. Constant scale, no camera move, no zoom, full body and props always in frame. Entire background stays perfectly uniform pure bright green chroma-key. Soft constant studio lighting, no green reflections. Charming precise physical acting with small movements suitable for a desktop companion. No dialogue, text, logos, symbols, new props or extra characters. ACTION: 0-3 seconds: Bit peers at the loose charcoal cable plug in his pincer, looks toward the laptop, then back at the plug. 3-6 seconds: gently turns the plug once to inspect it, one eyebrow rises, head tilts the other way. 6-8 seconds: an honest little shrug with his free pincer toward the viewer, softly puzzled, not distressed. 8-10 seconds: relax into the original curious pose holding the plug. No pretend typing, no requesting handwave, no successful reconnection. Keep the cable physically attached to the laptop at the other end, no sparks or glow.",
+          "params": {
+            "duration": "10",
+            "negative_prompt": "camera movement, zoom, pan, camera rotation, cuts, background texture, floor, background shadows, green reflections, extra limbs, extra claws, human hands, floating props, broken anatomy, melting, duplicated character, changing laptop, changing costume, text, letters, subtitles, logos, intense motion blur, cropped body, offscreen movement"
+          }
+        }
+      },
+      "preparation": {
+        "framesAnalyzed": 241,
+        "sourceSize": [
+          1756,
+          1176
+        ],
+        "scaledCrop": [
+          162,
+          56,
+          478,
+          402
+        ],
+        "contentSize": [
+          440,
+          370
+        ],
+        "canvasSize": [
+          512,
+          512
+        ],
+        "loopBlendSeconds": 0.5,
+        "ffmpegVersion": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+      }
+    }
+  ],
+  "generationCharges": [
+    {
+      "generation": "idle/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "idle/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "thinking/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "thinking/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "coffee/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "coffee/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "waiting/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "waiting/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "done/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "done/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "unknown/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "unknown/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "coffee/rejected-take1/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "rejected/thinking-take1/video-response.json",
+      "usd": 0.7
+    },
+    {
+      "generation": "rejected/thinking-take1/reference-response.json",
+      "usd": 0.15
+    },
+    {
+      "generation": "done/rejected-take1/video-response.json",
+      "usd": 0.7
+    }
+  ],
+  "totalNewUSD": 7.35,
+  "working": "Reused the previously approved Bit motion study; original study $0.85 excluded from this batch."
+}

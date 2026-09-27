@@ -1,0 +1,29 @@
+name: Release
+# Run from the Actions tab once the SIDEBIT_UPDATE_KEY secret exists. Releases can also be built and signed locally.
+on:
+  workflow_dispatch:
+    inputs:
+      tag: { description: "Tag to release, for example v0.7.0", required: true }
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.tag }}" }
+      - run: swift test
+      - name: Build and sign the update
+        env: { SIDEBIT_UPDATE_KEY: "${{ secrets.SIDEBIT_UPDATE_KEY }}" }
+        run: |
+          test -n "$SIDEBIT_UPDATE_KEY" || { echo "Add the SIDEBIT_UPDATE_KEY repository secret"; exit 1; }
+          ./scripts/build-app.sh
+      - run: python3 scripts/smoke-hooks.py dist/Sidebit.app
+      - name: Check tag matches app version
+        env: { TAG: "${{ inputs.tag }}" }
+        run: test "v$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist)" = "$TAG"
+      - name: Publish release
+        env: { GH_TOKEN: "${{ github.token }}", TAG: "${{ inputs.tag }}" }
+        run: |
+          notes="$(awk -v v="## ${TAG#v}" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md)"
+          gh release create "$TAG" dist/Sidebit-*-arm64.zip dist/Sidebit-*-arm64.zip.sig --title "Sidebit ${TAG#v}" --notes "$notes"

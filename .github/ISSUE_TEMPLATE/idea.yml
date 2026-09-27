@@ -1,0 +1,8 @@
+name: Idea, quip or moment
+description: A new joke for Bit, a moment worth unlocking, or a feature
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes: { label: Your idea, description: "Quips: 44 characters max, kind, about the work. Moments: what counts, and a funny title." }
+    validations: { required: true }
