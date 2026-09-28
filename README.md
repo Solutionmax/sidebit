@@ -26,6 +26,8 @@ Bit types when your agent types, waves when it needs you, and quietly collects t
   <a href="#faq">FAQ</a>
 </p>
 
+<p align="center"><a href="https://github.com/Solutionmax/sidebit/releases/download/v0.8.0-beta.1/sidebit-launch.mp4"><img src="docs/images/launch-video.jpg" width="720" alt="Watch the 20-second Sidebit launch video"></a></p>
+
 > **Public beta.** Sidebit 0.8 is feature complete and in daily use, but it is new. Expect rough edges, and please [open an issue](https://github.com/Solutionmax/sidebit/issues/new/choose) when Bit does something odd.
 
 ---
