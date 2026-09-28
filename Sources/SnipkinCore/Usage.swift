@@ -212,7 +212,7 @@ public struct UsageReader: Sendable {
     }
 }
 
-public enum SidebitVersion { public static let current = "0.8.0-beta.1" }
+public enum SidebitVersion { public static let current = "0.8.0-beta.2" }
 
 /// Last known allowance per provider, so a relaunch or a failed refresh never shows an empty card.
 public struct UsageStore: Sendable {
@@ -268,5 +268,20 @@ extension UsageSnapshot {
             if window.usedPercent > known.usedPercent { newer = true }
         }
         return newer
+    }
+}
+
+/// Allowance colour by how full a window is: calm green, amber from half, ember at three quarters, red near the end.
+public enum UsageTint {
+    public typealias RGB = (red: Double, green: Double, blue: Double)
+    public static let stops: [(percent: Double, rgb: RGB)] = [
+        (0, (0.52, 0.81, 0.62)), (50, (0.96, 0.77, 0.35)), (75, (1.0, 0.54, 0.30)), (90, (1.0, 0.30, 0.24)), (100, (0.92, 0.18, 0.20)),
+    ]
+    public static func rgb(_ percent: Double) -> RGB {
+        let p = min(100, max(0, percent))
+        guard let upper = stops.firstIndex(where: { $0.percent >= p }), upper > 0 else { return stops[0].rgb }
+        let (a, b) = (stops[upper - 1], stops[upper])
+        let f = (p - a.percent) / (b.percent - a.percent)
+        return (a.rgb.red + (b.rgb.red - a.rgb.red) * f, a.rgb.green + (b.rgb.green - a.rgb.green) * f, a.rgb.blue + (b.rgb.blue - a.rgb.blue) * f)
     }
 }

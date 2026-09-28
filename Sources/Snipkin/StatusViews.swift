@@ -260,19 +260,21 @@ struct FuelCard: View {
         } else if let snapshot = model.usageSnapshot(provider) {
             ForEach(snapshot.windows) { window in
                 let pace = UsagePace(window: window, now: model.now)
-                let hot = window.usedPercent >= 90 || pace?.runsOutAt != nil
+                let used = min(1, max(0, window.usedPercent / 100))
                 VStack(alignment: .leading, spacing: 7) {
                     HStack {
                         Text("\(name) · \(window.title)").font(.geist(12)).foregroundStyle(muted)
                         Spacer()
-                        Text("\(Int(window.usedPercent.rounded()))%").font(.mono(12)).foregroundStyle(hot ? accent : ink)
+                        Text("\(Int(window.usedPercent.rounded()))%").font(.mono(12)).foregroundStyle(tint(window.usedPercent))
                     }
                     GeometryReader { geometry in
                         let width = geometry.size.width
                         ZStack(alignment: .leading) {
                             Capsule().fill(Color.white.opacity(0.08))
-                            Capsule().fill(hot ? AnyShapeStyle(LinearGradient(colors: [rgbEmberLight, emberDeep], startPoint: .leading, endPoint: .trailing)) : AnyShapeStyle(ink))
-                                .frame(width: width * min(1, max(0, window.usedPercent / 100)))
+                            // The scale spans the whole track, so a fuller bar reveals warmer colours.
+                            LinearGradient(stops: UsageTint.stops.map { .init(color: tint($0.percent), location: $0.percent / 100) }, startPoint: .leading, endPoint: .trailing)
+                                .frame(width: width)
+                                .mask(alignment: .leading) { Capsule().frame(width: width * used) }
                             if let pace {
                                 Rectangle().fill(faint).frame(width: 1, height: 10).offset(x: width * min(1, pace.expectedPercent / 100))
                             }
@@ -294,7 +296,10 @@ struct FuelCard: View {
             }
         }
     }
-    private var rgbEmberLight: Color { Color(.sRGB, red: 1, green: 0.6, blue: 0.38, opacity: 1) }
+    private func tint(_ percent: Double) -> Color {
+        let c = UsageTint.rgb(percent)
+        return Color(.sRGB, red: c.red, green: c.green, blue: c.blue, opacity: 1)
+    }
 
     @ViewBuilder private func status(_ provider: Provider, _ snapshot: UsageSnapshot) -> some View {
         if !model.demo && model.now.timeIntervalSince(snapshot.fetchedAt) > 1800 {

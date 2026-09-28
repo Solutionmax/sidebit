@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0-beta.2
+
+- **Allowance bars that warn you.** Every limit bar now runs from calm green through amber and orange to red as it fills, and the percentage takes the colour of where you are. Before, a bar stayed white until 90% unless you were ahead of pace.
+
 ## 0.8.0-beta.1
 
 One window.

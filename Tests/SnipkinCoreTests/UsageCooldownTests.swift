@@ -27,4 +27,12 @@ final class UsageCooldownTests: XCTestCase {
         cooldown.postpone(.codex, by: -10, now: now)
         XCTAssertEqual(cooldown.nextRead(for: .codex), now.addingTimeInterval(300))
     }
+
+    func testAllowanceTintRunsFromGreenToRed() {
+        XCTAssertEqual(UsageTint.rgb(0).green, 0.81, accuracy: 0.001)
+        XCTAssertEqual(UsageTint.rgb(-5).green, UsageTint.rgb(0).green, "Out of range clamps")
+        XCTAssertEqual(UsageTint.rgb(62.5).green, (0.77 + 0.54) / 2, accuracy: 0.001, "Halfway between amber and ember")
+        XCTAssertGreaterThan(UsageTint.rgb(95).red, UsageTint.rgb(95).green * 3, "Near the end it is red")
+        XCTAssertEqual(UsageTint.rgb(140).red, 0.92, accuracy: 0.001)
+    }
 }
