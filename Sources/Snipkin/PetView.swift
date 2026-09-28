@@ -127,7 +127,7 @@ struct PetView: View {
     }
 }
 
-/// Obsidian speech: a dark glass card, the line as a serif quote, and a small monospaced caption.
+/// Obsidian speech: a dark glass card, the line as a quote, and a small monospaced caption.
 struct SpeechBubble: View {
     let text: String
     var context: String?

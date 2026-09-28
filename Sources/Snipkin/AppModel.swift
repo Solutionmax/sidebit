@@ -102,6 +102,7 @@ extension Activity {
     @Published var needsKeychain = false
     /// The settings tab to open next, for example after clicking a medal.
     var settingsTab: Int?
+    var settingsShare: ShareKind?
     @Published var notchAlerts: Bool { didSet { defaults.set(notchAlerts, forKey: "notchAlerts") } }
     // MARK: Updates
     @Published var autoUpdate: Bool { didSet { defaults.set(autoUpdate, forKey: "autoUpdate") } }

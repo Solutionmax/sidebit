@@ -35,7 +35,7 @@ struct MomentToast: View {
                     Text("\(moment.rarity.title.uppercased()) MEDAL UNLOCKED").font(.mono(max(9, 10.5 * s), .medium)).tracking(s < 0.8 ? 1.4 : 2.2).foregroundStyle(metal[1])
                     RarityPips(rarity: moment.rarity, color: metal[1])
                 }.opacity(fade(t, 0.55, 0.9)).offset(x: 10 * (1 - fade(t, 0.55, 0.9)))
-                Text(moment.title).font(.serif(max(26, 46 * s))).lineLimit(1).minimumScaleFactor(0.7).padding(.top, 4 * s + 2)
+                Text(moment.title).font(.display(max(26, 46 * s))).lineLimit(1).minimumScaleFactor(0.7).padding(.top, 4 * s + 2)
                     .foregroundStyle(moment.rarity == .obsidian ? AnyShapeStyle(LinearGradient(colors: [Color(.sRGB, red: 1, green: 0.72, blue: 0.52, opacity: 1), accent], startPoint: .top, endPoint: .bottom))
                                      : AnyShapeStyle(LinearGradient(colors: [.white, metal[0], metal[1]], startPoint: .top, endPoint: .bottom)))
                     .shadow(color: metal[1].opacity(0.35), radius: 12)

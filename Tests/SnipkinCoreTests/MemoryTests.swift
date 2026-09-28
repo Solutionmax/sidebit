@@ -76,6 +76,37 @@ final class MemoryTests: XCTestCase {
         XCTAssertEqual(StatusLine.run(input: Data(), config: StatusLineConfig(showBit: false), sessions: SessionFiles(directory: root), usage: usage), "")
     }
 
+    func testStatusLineNeverOverwritesFresherLimitsWithStaleOnes() throws {
+        let root = try temporary()
+        let usage = UsageStore(directory: root.appendingPathComponent("usage"))
+        let sessions = SessionFiles(directory: root), journal = Journal(directory: root.appendingPathComponent("journal"))
+        let reset = Date(timeIntervalSince1970: 1_900_000_000)
+        func line(_ five: Double, resets: Date = reset) -> Data {
+            Data(#"{"session_id":"idle","rate_limits":{"five_hour":{"used_percentage":\#(five),"resets_at":\#(Int(resets.timeIntervalSince1970))}}}"#.utf8)
+        }
+        // The account API says 40%; an idle session still remembers 21% from this morning.
+        try usage.save(UsageSnapshot(provider: .claude, windows: [UsageWindow(id: "five_hour", title: "5 hours", usedPercent: 40, resetsAt: reset, durationMinutes: 300)],
+                                     fetchedAt: reset.addingTimeInterval(-3600), source: "Claude account usage"))
+        _ = StatusLine.run(input: line(21), sessions: sessions, journal: journal, usage: usage, now: reset.addingTimeInterval(-3000))
+        XCTAssertEqual(usage.load(.claude)?.windows.first?.usedPercent, 40, "A lower reading in the same window is stale")
+        // A higher reading is newer news.
+        _ = StatusLine.run(input: line(45), sessions: sessions, journal: journal, usage: usage, now: reset.addingTimeInterval(-2900))
+        XCTAssertEqual(usage.load(.claude)?.windows.first?.usedPercent, 45)
+        // Repeating the same reading must not look fresh, or Bit never asks the account again.
+        _ = StatusLine.run(input: line(45), sessions: sessions, journal: journal, usage: usage, now: reset.addingTimeInterval(-2000))
+        XCTAssertEqual(usage.load(.claude)?.fetchedAt, reset.addingTimeInterval(-2900))
+        // A new window starts low again, and that counts.
+        _ = StatusLine.run(input: line(3, resets: reset.addingTimeInterval(18_000)), sessions: sessions, journal: journal, usage: usage, now: reset.addingTimeInterval(60))
+        XCTAssertEqual(usage.load(.claude)?.windows.first?.usedPercent, 3)
+        // Without reset times, only a rise counts.
+        func bare(_ value: Double) -> UsageSnapshot {
+            UsageSnapshot(provider: .claude, windows: [UsageWindow(id: "five_hour", title: "5 hours", usedPercent: value, resetsAt: nil, durationMinutes: 300)], source: "Claude Code status line")
+        }
+        XCTAssertFalse(bare(10).adds(to: bare(40)))
+        XCTAssertFalse(bare(40).adds(to: bare(40)))
+        XCTAssertTrue(bare(41).adds(to: bare(40)))
+    }
+
     func testStatusLineInstallKeepsAndRestoresExistingLine() throws {
         let home = try temporary(), state = try temporary()
         let folder = home.appendingPathComponent(".claude")

@@ -212,7 +212,7 @@ public struct UsageReader: Sendable {
     }
 }
 
-public enum SidebitVersion { public static let current = "0.7.0-beta.2" }
+public enum SidebitVersion { public static let current = "0.8.0-beta.1" }
 
 /// Last known allowance per provider, so a relaunch or a failed refresh never shows an empty card.
 public struct UsageStore: Sendable {
@@ -245,4 +245,28 @@ final class KeychainTokenCache: @unchecked Sendable {
     }
     func store(_ token: String, until: Date) { lock.lock(); value = (token, until); lock.unlock() }
     func clear() { lock.lock(); value = nil; lock.unlock() }
+}
+
+extension UsageSnapshot {
+    /// Whether this reading tells us something `current` does not. An idle Claude Code session keeps
+    /// repeating the limits of its last request, so a status line reading only counts when it is newer:
+    /// a later window, or more used in the same window. Use only climbs until a window resets.
+    public func adds(to current: UsageSnapshot) -> Bool {
+        let tolerance: TimeInterval = 300
+        var newer = false
+        for window in windows {
+            guard let known = current.windows.first(where: { $0.id == window.id }) else { newer = true; continue }
+            guard let reset = window.resetsAt, let knownReset = known.resetsAt else {
+                // Without reset times a drop cannot be told apart from a stale session, so only a rise counts.
+                if window.usedPercent < known.usedPercent { return false }
+                if window.usedPercent > known.usedPercent { newer = true }
+                continue
+            }
+            if reset < knownReset.addingTimeInterval(-tolerance) { return false }
+            if reset > knownReset.addingTimeInterval(tolerance) { newer = true; continue }
+            if window.usedPercent < known.usedPercent { return false }
+            if window.usedPercent > known.usedPercent { newer = true }
+        }
+        return newer
+    }
 }

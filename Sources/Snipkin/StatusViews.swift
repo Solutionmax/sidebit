@@ -29,43 +29,57 @@ func elapsedLabel(since date: Date?, now: Date, activity: Activity) -> String {
     return seconds < 3600 ? String(format: "%d:%02d", seconds / 60, seconds % 60) : "\(seconds / 3600)h \(seconds / 60 % 60)m"
 }
 
-struct StatusCard: View {
+/// The first page Bit opens: what needs you, live sessions, today and allowance.
+struct NowPage: View {
     @ObservedObject var model: AppModel
+    /// Moves the window to another page, optionally picking a share card.
+    let go: (SettingsPage, ShareKind?) -> Void
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            section {
-                header
-                if !model.demo && model.installed.isEmpty { welcome }
-                if let attention = model.visibleSessions.first(where: { $0.effectiveActivity(now: model.now) == .waiting }) { urgent(attention) }
-                if let update = model.update { updateBanner(update) }
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .bottom) {
+                PageHeader(title: "Now", subtitle: summary)
+                Spacer()
+                Text("⌥ B").font(.mono(10.5, .medium)).foregroundStyle(faint)
+                    .padding(.horizontal, 7).padding(.vertical, 4).overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.white.opacity(0.1)))
+                    .help("Open this window from anywhere")
             }
-            section { sessions }
-            section { TodayCard(model: model) }
-            section { medals }
-            if model.usageEnabled || model.demo {
-                section {
-                    Kicker(text: "Allowance", trailing: fuelSource)
-                    FuelCard(model: model, providers: fuelProviders, framed: false)
-                }
-            }
-            if model.demo { section { previewControls } }
-            if let message = model.message {
-                section {
-                    HStack(alignment: .top) {
-                        Text(message).font(.geist(11)).fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 4)
-                        Button { model.message = nil } label: { Image(systemName: "xmark").font(.system(size: 9)) }.buttonStyle(.plain).accessibilityLabel("Dismiss message")
-                    }.foregroundStyle(accent)
-                }
-            }
+            if !model.demo && model.installed.isEmpty { card { welcome } }
+            if let attention = model.visibleSessions.first(where: { $0.effectiveActivity(now: model.now) == .waiting }) { urgent(attention) }
+            if let update = model.update { updateBanner(update) }
+            ScrollView {
+                HStack(alignment: .top, spacing: 20) {
+                    VStack(spacing: 18) {
+                        card { sessions }
+                        card { medals }
+                        if model.demo { card { previewControls } }
+                    }.frame(width: 360)
+                    VStack(spacing: 18) {
+                        card { TodayCard(model: model) }
+                        if model.usageEnabled || model.demo {
+                            card {
+                                Kicker(text: "Allowance", trailing: fuelSource)
+                                FuelCard(model: model, providers: fuelProviders, framed: false)
+                            }
+                        }
+                        if let message = model.message {
+                            HStack(alignment: .top) {
+                                Text(message).font(.geist(11)).fixedSize(horizontal: false, vertical: true)
+                                Spacer(minLength: 4)
+                                Button { model.message = nil } label: { Image(systemName: "xmark").font(.system(size: 9)) }.buttonStyle(.plain).accessibilityLabel("Dismiss message")
+                            }.foregroundStyle(accent)
+                        }
+                    }.frame(maxWidth: .infinity)
+                }.padding(.bottom, 4)
+            }.scrollIndicators(.hidden)
             footer
-        }.frame(width: 392).background(PanelBackground()).foregroundStyle(ink).environment(\.colorScheme, .dark)
+        }
     }
 
-    private func section<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+    private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 12) { content() }
-            .padding(.horizontal, 20).padding(.vertical, 16).frame(maxWidth: .infinity, alignment: .leading)
-            .overlay(alignment: .bottom) { Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1) }
+            .padding(16).frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(hairline))
     }
 
     private var fuelProviders: [Provider] {
@@ -78,22 +92,6 @@ struct StatusCard: View {
         return model.refreshingUsage.isEmpty ? "Every 5 min" : "Updating"
     }
 
-    private var header: some View {
-        HStack(spacing: 13) {
-            BitAvatar(activity: model.displayActivity)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(Bit.name).font(.geist(15, .medium))
-                Text(summary).font(.geist(12)).foregroundStyle(muted).lineLimit(1)
-            }
-            Spacer(minLength: 0)
-            Text("⌥ B").font(.mono(10.5, .medium)).foregroundStyle(faint)
-                .padding(.horizontal, 7).padding(.vertical, 4).overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.white.opacity(0.1)))
-                .help("Open this panel from anywhere")
-            Button { model.showSettings?() } label: {
-                Image(systemName: "slider.horizontal.3").font(.system(size: 12)).foregroundStyle(muted).frame(width: 28, height: 28)
-            }.buttonStyle(.plain).accessibilityLabel("Settings")
-        }
-    }
     private var summary: String {
         if model.demo { return "Preview with example data" }
         let count = model.visibleSessions.count
@@ -134,7 +132,7 @@ struct StatusCard: View {
     /// First run: two buttons away from a working companion.
     private var welcome: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Say hi to Bit.").font(.serif(24))
+            Text("Say hi to Bit.").font(.display(24))
             Text("Connect your agents and Bit will type, think, wave and celebrate with them. Everything stays on this Mac.")
                 .font(.geist(12)).foregroundStyle(muted).fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {
@@ -151,9 +149,9 @@ struct StatusCard: View {
         Kicker(text: "Sessions", trailing: model.demo ? "Example" : model.visibleSessions.isEmpty ? nil : "Live")
         if model.visibleSessions.isEmpty {
             HStack {
-                Text("Room for your next big idea.").font(.serif(19)).foregroundStyle(muted)
+                Text("Room for your next big idea.").font(.display(19)).foregroundStyle(muted)
                 Spacer()
-                Button("Setup") { model.showSettings?() }.buttonStyle(QuietButton())
+                Button("Setup") { go(.connections, nil) }.buttonStyle(QuietButton())
             }
         } else {
             ScrollView {
@@ -168,7 +166,7 @@ struct StatusCard: View {
                             .accessibilityLabel("\(session.provider.title), \(session.project), \(activity.title)")
                     }
                 }
-            }.scrollIndicators(.hidden).frame(height: min(CGFloat(model.visibleSessions.count) * 48, 150))
+            }.scrollIndicators(.hidden).frame(height: min(CGFloat(model.visibleSessions.count) * 48, 250))
         }
     }
 
@@ -176,7 +174,7 @@ struct StatusCard: View {
     @ViewBuilder private var medals: some View {
         let unlocked = model.unlockedMoments
         Kicker(text: "Medals", trailing: "\(unlocked.count) of \(Moment.allCases.count)")
-        Button { model.settingsTab = 3; model.showSettings?() } label: {
+        Button { go(.medals, nil) } label: {
             HStack(spacing: 8) {
                 ForEach(unlocked.prefix(5), id: \.0) { moment, _ in Medal(moment: moment, size: 34).help("\(moment.title): \(moment.blurb)") }
                 ForEach(0..<max(0, min(5, Moment.allCases.count) - unlocked.prefix(5).count), id: \.self) { _ in
@@ -211,9 +209,9 @@ struct StatusCard: View {
             Button { model.playTinyBreak() } label: { Label("Coffee", systemImage: "cup.and.saucer") }.buttonStyle(.plain)
                 .disabled(model.activity == .waiting || model.activity == .unknown)
             Spacer()
-            Button { model.showRecap?() } label: { Label("Your week", systemImage: "calendar") }.buttonStyle(.plain)
+            Button { go(.share, .week) } label: { Label("Share your week", systemImage: "calendar") }.buttonStyle(.plain)
                 .foregroundStyle(model.weekReady ? accent : muted)
-        }.font(.geist(11.5)).foregroundStyle(muted).labelStyle(.titleAndIcon).padding(.horizontal, 20).padding(.vertical, 13)
+        }.font(.geist(11.5)).foregroundStyle(muted).labelStyle(.titleAndIcon).padding(.top, 2)
     }
 }
 

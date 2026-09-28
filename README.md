@@ -26,7 +26,7 @@ Bit types when your agent types, waves when it needs you, and quietly collects t
   <a href="#faq">FAQ</a>
 </p>
 
-> **Public beta.** Sidebit 0.7 is feature complete and in daily use, but it is new. Expect rough edges, and please [open an issue](https://github.com/Solutionmax/sidebit/issues/new/choose) when Bit does something odd.
+> **Public beta.** Sidebit 0.8 is feature complete and in daily use, but it is new. Expect rough edges, and please [open an issue](https://github.com/Solutionmax/sidebit/issues/new/choose) when Bit does something odd.
 
 ---
 
@@ -43,7 +43,9 @@ Bit is a small voxel robot with a graphite laptop and a lot of opinions. It live
 - **It remembers.** Every day becomes a small diary: turns, commands, edits, lines, your busiest hour and your streak. Keep it, or share it.
 - **It is fun to play with.** Hold Bit to boop it. Drag it around and it complains. Leave it idle and it attempts a very serious coffee break.
 
-<p align="center"><img src="docs/images/status.png" width="360" alt="The Sidebit panel: sessions with live timers, today's diary, medals and allowance"></p>
+<p align="center"><img src="docs/images/app-now.png" width="860" alt="The Sidebit window on Now: an agent waiting for you, live sessions, today's diary, medals and allowance"></p>
+
+<p align="center"><sub>One window for everything. Click Bit and it opens on <b>Now</b>; medals, share cards and settings sit in the sidebar.</sub></p>
 
 ## Install
 
@@ -51,7 +53,7 @@ Bit is a small voxel robot with a graphite laptop and a lot of opinions. It live
 
 1. Download **`Sidebit-<version>-arm64.zip`** from the [latest release](https://github.com/Solutionmax/sidebit/releases).
 2. Unzip it and drag **Sidebit.app** into **Applications**.
-3. Open it. This build is signed ad hoc, not notarized, so the first time macOS may say it cannot verify the developer. Open **System Settings → Privacy & Security** and click **Open Anyway**.
+3. Open it. This build is signed with Sidebit's own certificate but not notarized by Apple, so the first time macOS may say it cannot verify the developer. Open **System Settings → Privacy & Security** and click **Open Anyway**.
 4. Bit appears in the corner of your screen and says hi. Click **Connect Claude Code** and/or **Connect Codex**.
 5. Start a **new** agent session. Codex asks you once to review and trust the new hooks (`/hooks`); Sidebit never bypasses that.
 
@@ -71,13 +73,13 @@ That's it. Updates arrive by themselves from now on: Sidebit checks this reposit
 
 | You want to… | Do this |
 | --- | --- |
-| See all sessions, today's diary and your allowance | Click Bit, or press **⌥B** anywhere |
+| See all sessions, today's diary and your allowance | Click Bit, or press **⌥B** anywhere. The window opens on **Now** |
 | Get a quick glance | Hover over Bit |
-| Jump to the agent that needs you | Click **Open** in the alert or the panel |
+| Jump to the agent that needs you | Click **Open** in the alert or on **Now** |
 | Make Bit happy | Hold the mouse on Bit for a second |
 | Move Bit | Drag it anywhere; it remembers the spot |
-| Browse your medals | Panel → **Medals → View all**, or *Settings → Medals* |
-| Share your day or week | **Share** in the panel, or the menu bar menu |
+| Browse your medals | **Medals** in the sidebar, or **View all** on Now |
+| Share your day, week or a medal | **Share** in the sidebar: pick a card, then **Save PNG** or **Copy image** |
 
 The menu bar icon is a small speech bubble with Bit's eyes. The eyes follow the state; text only appears when an agent needs you.
 
@@ -89,7 +91,9 @@ Sidebit counts what happens (never what is said) and turns it into **34 medals**
 
 <p align="center"><img src="docs/images/reveal.gif" width="620" alt="A silver medal flipping in with light rays and sparks"></p>
 
-When you earn one, the coin flips in next to Bit with light rays and sparks, Bit lifts its trophy, and the medal joins your case. Locked medals only show a riddle, like *"Before the coffee"* or *"It no longer sparks joy"*.
+When you earn one, the coin flips in next to Bit with light rays and sparks, Bit lifts its trophy, and the medal joins your case, where it catches the light every few seconds. Locked medals are a faint stamp with a riddle, like *"Before the coffee"* or *"It no longer sparks joy"*.
+
+<p align="center"><img src="docs/images/app-medals.png" width="860" alt="The medal case: the selected medal up close on the left, all 34 medals by metal on the right"></p>
 
 <details>
 <summary><b>See all 34 medals</b> (spoilers)</summary>
@@ -100,7 +104,9 @@ A few favourites: **Friday deploy** (a command after 4 PM on a Friday, *brave, v
 
 ## Share your day
 
-Every card is drawn on your Mac from local counts. Nothing is uploaded.
+Every card is drawn on your Mac from local counts. Nothing is uploaded. Open **Share**, pick a card, and save or copy it right there.
+
+<p align="center"><img src="docs/images/app-share.png" width="860" alt="The Share page with the weekly card, Save PNG and Copy image"></p>
 
 <p align="center"><img src="docs/images/share.jpg" width="820" alt="Today with Bit: 37 turns, zero regrets"></p>
 <p align="center">
@@ -110,7 +116,7 @@ Every card is drawn on your Mac from local counts. Nothing is uploaded.
 
 - **Today** (1200 × 630): the headline follows your day, from *"Zero regrets."* to *"Past midnight."*
 - **Your week** (1080 × 1350): turns, a heatmap of your rhythm, best day, latest hour and the Claude and Codex split. Bit brings it up on Friday afternoon.
-- **A medal** (1080 × 1080): click any medal you earned.
+- **A medal** (1080 × 1080): pick a medal in your case and press **Share medal**.
 
 ## Coming soon: more companions
 
@@ -172,4 +178,4 @@ Sidebit is free and MIT licensed. If Bit made your day a little lighter, you can
 
 ---
 
-<sub>Fonts: [Geist](https://github.com/vercel/geist-font) and [Instrument Serif](https://github.com/Instrument/instrument-serif), SIL Open Font License. Inspired by [Codenotch](https://github.com/vinzdg/codenotch) and [ccstatusline](https://github.com/sirmalloc/ccstatusline); no code or assets were copied. Sidebit is an independent project and is not affiliated with Anthropic or OpenAI.</sub>
+<sub>Fonts: [Geist](https://github.com/vercel/geist-font) (Sans and Mono), SIL Open Font License. Inspired by [Codenotch](https://github.com/vinzdg/codenotch) and [ccstatusline](https://github.com/sirmalloc/ccstatusline); no code or assets were copied. Sidebit is an independent project and is not affiliated with Anthropic or OpenAI.</sub>

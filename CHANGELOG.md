@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.0-beta.1
+
+One window.
+
+- **Everything in one wide window.** Clicking Bit (or ⌥B) opens it on **Now**: what needs you, live sessions, today, medals and allowance. Medals, Share and the settings sit in a sidebar. The separate sessions panel and the week window are gone; hovering Bit still shows the quick glance.
+- **A proper medal case.** The medal you pick sits big on the left with its story; all 34 medals sit by metal on the right, bronze first. Earned medals catch the light every few seconds (off with Reduce motion). Locked medals are a faint stamp of their real icon with the riddle as their name.
+- **Share without the extra window.** Pick Today, This week or a medal, see it full size, then **Save PNG** or **Copy image**.
+- **Meet Bit.** The Bit page now tells who Bit is: born 27 September 2026, what Bit always carries and a few favourite lines.
+- **One clear typeface.** Geist everywhere, in the app and on the share cards. The serif is gone.
+- **Updates live in the sidebar footer**, with the version and automatic updates. Reset position moved to the Bit page. Connections uses two columns.
+- **Fixed: wrong Claude limits.** An idle Claude Code session kept repeating the limits of its last request through the status line, and Bit believed it. A status line reading now only counts when it is newer, so Bit fetches your real account usage again.
+- **Fixed:** the share card no longer shows zero before your day has loaded, and says "One turn." instead of "1 turns."
+
 ## 0.7.0-beta.2
 
 - **Accessibility permission now survives updates.** Sidebit is signed with a stable certificate instead of ad hoc, so following Claude Desktop chat and Cowork keeps working after an update. Coming from beta 1, remove Sidebit in *Privacy & Security → Accessibility* and add it again, once.

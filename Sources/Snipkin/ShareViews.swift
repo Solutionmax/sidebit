@@ -52,8 +52,8 @@ struct ShareCard: View {
             LitBit(pose: moments.isEmpty ? "working" : "done", width: 460).offset(x: 50, y: 110)
             VStack(alignment: .leading, spacing: 0) {
                 Text(kicker).font(.mono(13, .medium)).tracking(2.6).foregroundStyle(muted)
-                Text(headline.0).font(.serif(68)).foregroundStyle(ink).padding(.top, 14)
-                Text(headline.1).font(.serif(68, italic: true)).foregroundStyle(accent).padding(.top, -16)
+                Text(headline.0).font(.display(68)).foregroundStyle(ink).padding(.top, 14)
+                Text(headline.1).font(.display(68)).foregroundStyle(accent).padding(.top, -16)
                 HStack(alignment: .firstTextBaseline, spacing: 44) {
                     ForEach(figures, id: \.1) { value, label in figure(value, label) }
                 }.padding(.top, 18)
@@ -92,7 +92,7 @@ struct ShareCard: View {
             return (day.sessions == 1 ? "One session." : "\(day.sessions) sessions.", day.sessions >= 10 ? "Bit is dizzy." : "Warming up.")
         }
         if day.turns == 0 { return ("A fresh page.", "Bit is ready.") }
-        if day.nightOwl { return ("\(day.turns) turns.", "Past midnight.") }
+        if day.nightOwl { return (day.turns == 1 ? "One turn." : "\(day.turns) turns.", "Past midnight.") }
         if day.turns >= 50 { return ("\(day.turns) turns.", "What a day.") }
         return day.turns == 1 ? ("One turn.", "One tiny trophy.") : ("\(day.turns) turns.", "Zero regrets.")
     }
@@ -131,7 +131,7 @@ struct RecapCard: View {
             VStack(alignment: .leading, spacing: 0) {
                 Text(kicker).font(.mono(20, .medium)).tracking(4).foregroundStyle(muted)
                 Text(week.turns.formatted()).font(.geist(250, .ultraLight)).tracking(-12).foregroundStyle(emberText).padding(.top, 20).lineLimit(1).minimumScaleFactor(0.5)
-                (Text("turns with Bit. ").foregroundColor(ink) + Text(tagline).italic().foregroundColor(accent)).font(.serif(52)).padding(.top, 0)
+                (Text("turns with Bit. ").foregroundColor(ink) + Text(tagline).foregroundColor(accent)).font(.display(52)).padding(.top, 0)
                 heatmap.padding(.top, 50)
                 VStack(spacing: 0) {
                     if let best = week.bestDay { fact("Best day", "\(weekday(best.day)) · \(best.turns) turns") }
@@ -226,7 +226,7 @@ struct MedalCard: View {
                 Medal(moment: moment, size: 380)
                 Text("\(moment.rarity.title.uppercased()) MEDAL · NO. \(String(format: "%02d", number)) OF \(Moment.allCases.count)")
                     .font(.mono(22, .medium)).tracking(5).foregroundStyle(metal[1]).padding(.top, 60)
-                Text(moment.title).font(.serif(124)).padding(.top, 10)
+                Text(moment.title).font(.display(124)).padding(.top, 10)
                     .foregroundStyle(moment.rarity == .obsidian ? AnyShapeStyle(emberText) : AnyShapeStyle(LinearGradient(colors: [.white, metal[0], metal[1]], startPoint: .top, endPoint: .bottom)))
                 Text(moment.blurb).font(.geist(29)).foregroundStyle(muted).multilineTextAlignment(.center).frame(maxWidth: 760).padding(.top, 8)
                 HStack(spacing: 10) {

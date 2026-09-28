@@ -2,64 +2,112 @@ import AppKit
 import SwiftUI
 import SnipkinCore
 
+/// The wide settings window: a sidebar, medals and sharing up top, settings below.
 struct SettingsCard: View {
     @ObservedObject var model: AppModel
     var close: () -> Void
-    @State private var tab: Int
+    @State private var page: SettingsPage
+    @State private var share: ShareKind
+    @State private var medal: Moment?
     init(model: AppModel, close: @escaping () -> Void) {
         self.model = model; self.close = close
-        _tab = State(initialValue: model.settingsTab ?? (CommandLine.arguments.contains("--show-connections") ? 2 : CommandLine.arguments.contains("--show-moments") ? 3 : 0))
+        let arguments = CommandLine.arguments
+        let fallback: SettingsPage = arguments.contains("--show-connections") ? .connections : arguments.contains("--show-moments") ? .medals
+            : arguments.contains("--show-share") ? .share : arguments.contains("--show-status") ? .now : .bit
+        _page = State(initialValue: model.settingsTab.flatMap(SettingsPage.init(rawValue:)) ?? fallback)
+        _share = State(initialValue: model.settingsShare ?? (arguments.contains("--show-week") ? .week : .today))
+        _medal = State(initialValue: model.unlockedMoments.first?.0)
     }
-    private let tabs = [(0, "Bit"), (3, "Medals"), (1, "Sounds"), (2, "Connections")]
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Settings").font(.serif(30))
-                Spacer(minLength: 0)
-                Button(action: close) { Image(systemName: "xmark").font(.system(size: 11, weight: .semibold)).frame(width: 26, height: 26).background(surface, in: Circle()) }
-                    .buttonStyle(.plain).accessibilityLabel("Close settings")
-            }.padding(.horizontal, 22).padding(.top, 22)
-            HStack(spacing: 18) {
-                ForEach(tabs, id: \.0) { id, title in
-                    Button { tab = id } label: {
-                        VStack(spacing: 7) {
-                            Text(title).font(.geist(12.5, tab == id ? .medium : .regular)).foregroundStyle(tab == id ? ink : muted)
-                            Rectangle().fill(tab == id ? accent : .clear).frame(height: 1.5)
-                        }.fixedSize()
-                    }.buttonStyle(.plain)
-                }
-                Spacer()
-            }.padding(.horizontal, 22).padding(.top, 14)
-            Rectangle().fill(hairline).frame(height: 1)
+        HStack(spacing: 0) {
+            sidebar.frame(width: 208)
+            Rectangle().fill(hairline).frame(width: 1)
             Group {
-                if tab == 0 { companion }
-                else if tab == 1 { sounds }
-                else if tab == 3 { MomentsGrid(model: model) }
-                else { connections }
-            }.padding(22)
-            Rectangle().fill(hairline).frame(height: 1)
-            HStack {
-                Button("Reset position") { model.resetPosition?() }.buttonStyle(.plain)
-                Spacer()
-                Text("Sidebit \(SidebitVersion.current)")
-            }.font(.mono(10)).foregroundStyle(faint).padding(.horizontal, 22).padding(.vertical, 14)
-        }.frame(width: 440).background(PanelBackground()).foregroundStyle(ink).environment(\.colorScheme, .dark)
+                switch page {
+                case .now: NowPage(model: model) { target, card in if let card { share = card }; page = target }
+                case .medals: MedalsPage(model: model, selected: $medal) { moment in medal = moment; share = .medal; page = .share }
+                case .share: SharePage(model: model, kind: $share, medal: medal)
+                case .bit: bitPage
+                case .sounds: scrolling { PageHeader(title: "Sounds", subtitle: "A small sound when an agent needs you or finishes."); sounds }
+                case .connections: scrolling { PageHeader(title: "Connections", subtitle: "What Bit follows, and how."); connections }
+                }
+            }
+            .padding(.horizontal, 30).padding(.top, 34).padding(.bottom, 24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(PanelBackground(radius: 0)).foregroundStyle(ink).environment(\.colorScheme, .dark)
+        .ignoresSafeArea()
+        .onExitCommand(perform: close)
+    }
+
+    private var sidebar: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 10) {
+                BitAvatar(activity: model.displayActivity, size: 34)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Sidebit").font(.display(22))
+                    Text(model.controllingSession.map { "\($0.provider.title) · \(model.activity.title)" } ?? "No agent yet").font(.mono(9.5)).foregroundStyle(faint).lineLimit(1)
+                }
+            }.padding(.horizontal, 8).padding(.top, 40).padding(.bottom, 18)
+            SidebarItem(title: "Now", symbol: "dot.radiowaves.left.and.right", trailing: model.visibleSessions.isEmpty ? nil : "\(model.visibleSessions.count)",
+                        dot: model.activity == .waiting, selected: page == .now) { page = .now }
+            SidebarItem(title: "Medals", symbol: "medal", trailing: "\(model.unlockedMoments.count)/\(Moment.allCases.count)", selected: page == .medals) { page = .medals }
+            SidebarItem(title: "Share", symbol: "square.and.arrow.up", dot: model.weekReady, selected: page == .share) { page = .share }
+            Kicker(text: "Settings").padding(.horizontal, 10).padding(.top, 18).padding(.bottom, 6)
+            SidebarItem(title: "Bit", symbol: "face.smiling", selected: page == .bit) { page = .bit }
+            SidebarItem(title: "Sounds", symbol: "speaker.wave.2", selected: page == .sounds) { page = .sounds }
+            SidebarItem(title: "Connections", symbol: "powerplug", selected: page == .connections) { page = .connections }
+            Spacer()
+            updates.padding(.horizontal, 10)
+        }
+        .font(.mono(10)).foregroundStyle(faint)
+        .padding(.horizontal, 12).padding(.bottom, 16)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .background(Color.white.opacity(0.02))
+    }
+
+    private func scrolling<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        ScrollView { VStack(alignment: .leading, spacing: 22) { content() }.frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8) }
+            .scrollIndicators(.hidden)
+    }
+
+    /// Version and updates, in the sidebar footer.
+    private var updates: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text("Sidebit \(SidebitVersion.current)")
+            if let update = model.update {
+                Button(model.updating ? "Installing…" : "Install \(update.version)") { model.installUpdate() }
+                    .buttonStyle(PrimaryButton()).disabled(model.updating)
+            } else {
+                Button(model.updating ? "Checking…" : "Check for updates") { model.checkForUpdates(manual: true) }
+                    .buttonStyle(.plain).foregroundStyle(model.updaterAvailable ? muted : faint).disabled(!model.updaterAvailable || model.updating)
+            }
+            if let status = model.updateStatus { Text(status).font(.geist(10.5)).lineLimit(3).fixedSize(horizontal: false, vertical: true) }
+            Toggle(isOn: $model.autoUpdate) { Text("Update automatically") }.toggleStyle(.switch).controlSize(.mini).tint(accent)
+        }
+    }
+
+    private var bitPage: some View {
+        HStack(alignment: .top, spacing: 28) {
+            VStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18).fill(Color(white: 0.047))
+                    RoundedRectangle(cornerRadius: 18).fill(RadialGradient(colors: [accent.opacity(0.2), .clear], center: UnitPoint(x: 0.5, y: 0.75), startRadius: 0, endRadius: 180))
+                    PetView(activity: .working, size: 180, reducedMotion: model.reducedMotion, showQuip: true,
+                            quip: "Works on my laptop.", quipContext: "Bit · Compiling dreams", urgentQuip: true)
+                        .padding(.top, 40)
+                }
+                .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(hairline))
+                .frame(height: 330)
+                Text("Click for sessions · hold to boop · drag to move · ⌥B").font(.mono(9.5)).foregroundStyle(faint)
+            }.frame(width: 270)
+            scrolling { BitLore(); companion }
+        }
     }
 
     private var companion: some View {
         VStack(alignment: .leading, spacing: 18) {
-            HStack(spacing: 16) {
-                ZStack {
-                    RadialGradient(colors: [accent.opacity(0.35), .clear], center: .bottom, startRadius: 0, endRadius: 70)
-                    PetView(activity: .working, size: 92, reducedMotion: true)
-                }.frame(width: 104, height: 104).background(Color.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 16))
-                    .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(hairline))
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(Bit.name).font(.serif(26))
-                    Text(Bit.subtitle).font(.geist(12)).foregroundStyle(muted).fixedSize(horizontal: false, vertical: true)
-                    Text("Click for sessions · hold to boop · drag to move · ⌥B").font(.mono(10)).foregroundStyle(faint)
-                }
-            }
             group("Companion") {
                 HStack { Text("Size").font(.geist(12)); Slider(value: $model.size, in: 140...250).tint(accent).accessibilityLabel("Companion size") }
                 toggle("Coffee breaks while idle", value: $model.sillyMoments)
@@ -68,31 +116,17 @@ struct SettingsCard: View {
                 toggle("Notch alert when an agent needs you", value: $model.notchAlerts)
                 toggle("Open at login", value: Binding(get: { model.launchAtLogin }, set: { model.setLaunchAtLogin($0) }))
                 toggle("Preview with example data", value: $model.demo)
-            }
-            group("Updates") {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(model.update.map { "Sidebit \($0.version) is available" } ?? "You're on \(SidebitVersion.current)").font(.geist(12.5, .medium))
-                        Text(model.updateStatus ?? (model.updaterAvailable ? "Signed updates from GitHub Releases." : "Updates are not configured for this build.")).font(.geist(11)).foregroundStyle(muted)
-                    }
+                HStack {
+                    Text("Lost Bit off screen?").font(.geist(12)).foregroundStyle(muted)
                     Spacer()
-                    if model.update != nil {
-                        Button("Install and restart") { model.installUpdate() }.buttonStyle(PrimaryButton()).disabled(model.updating)
-                    } else {
-                        Button("Check now") { model.checkForUpdates(manual: true) }.buttonStyle(QuietButton()).disabled(!model.updaterAvailable || model.updating)
-                    }
+                    Button("Reset position") { model.resetPosition?() }.buttonStyle(QuietButton())
                 }
-                toggle("Check for updates automatically", value: $model.autoUpdate)
             }
         }
     }
 
     private var sounds: some View {
         VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("A gentle heads-up.").font(.serif(24))
-                Text("A small sound when an agent needs you or finishes. Quiet the rest of the time.").font(.geist(12)).foregroundStyle(muted).fixedSize(horizontal: false, vertical: true)
-            }
             group("Events") {
                 toggle("Enable event sounds", value: $model.soundsEnabled)
                 soundRow("Turn finished", activity: .done, value: $model.completionSound)
@@ -111,7 +145,13 @@ struct SettingsCard: View {
     }
 
     private var connections: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        HStack(alignment: .top, spacing: 22) {
+            VStack(alignment: .leading, spacing: 18) { agents; statusLine }.frame(maxWidth: .infinity, alignment: .topLeading)
+            VStack(alignment: .leading, spacing: 18) { allowance; desktop }.frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+    }
+
+    private var agents: some View {
             group("Agents") {
                 ForEach(Provider.allCases) { provider in
                     HStack {
@@ -128,15 +168,21 @@ struct SettingsCard: View {
                 }
                 note("Adds local status hooks and keeps a backup. Covers the CLIs, the IDE extensions, the Codex app and Claude's Code tab. Codex asks you to trust the hooks once.")
             }
+    }
+    private var statusLine: some View {
             group("Status line") {
                 toggle("Show Bit below the Claude Code prompt", value: Binding(get: { model.statusLineInstalled }, set: { model.installStatusLine($0) }))
                 note("Also delivers your real limits without extra requests. An existing status line keeps running above Bit and returns exactly as it was.")
             }
+    }
+    private var allowance: some View {
             group("Allowance") {
                 toggle("Show account usage", value: $model.usageEnabled)
                 toggle("Use Claude Code's sign-in from the Keychain", value: $model.claudeKeychain)
                 note("macOS asks once before Sidebit may read Claude Code's Keychain item; Sidebit never changes it. Credentials only go to the matching provider, at most every five minutes.")
             }
+    }
+    @ViewBuilder private var desktop: some View {
             group("Desktop apps", badge: "Experimental") {
                 toggle("Follow Claude & Codex desktop", value: $model.desktopEnabled)
                 if model.desktopEnabled && !model.desktopTrusted {
@@ -145,7 +191,6 @@ struct SettingsCard: View {
                 note(!model.desktopEnabled ? "Off. Hooks still work." : !model.desktopTrusted ? "Accessibility permission required." : "Reads recognizable buttons only. No chat text, no browser.")
             }
             if let message = model.message { Text(message).font(.geist(11)).foregroundStyle(accent).fixedSize(horizontal: false, vertical: true) }
-        }
     }
 
     private func group<Content: View>(_ title: String, badge: String? = nil, @ViewBuilder _ content: () -> Content) -> some View {

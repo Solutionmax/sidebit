@@ -57,7 +57,7 @@ public enum StatusLine {
                            journal: Journal = Journal(directory: Journal.defaultDirectory), usage: UsageStore = UsageStore(), now: Date = Date()) -> String {
         let input = parse(data, now: now)
         if let input {
-            if let snapshot = input.usage { try? usage.save(snapshot) }
+            if let snapshot = input.usage, usage.load(.claude).map({ snapshot.adds(to: $0) }) ?? true { try? usage.save(snapshot) }
             if let id = input.sessionID, let added = input.linesAdded, let removed = input.linesRemoved {
                 _ = try? journal.recordLines(session: id, added: added, removed: removed, project: input.project, now: now)
             }

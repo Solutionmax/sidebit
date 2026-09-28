@@ -32,9 +32,11 @@ if let code = HookRuntime.run() { exit(code) }
                 NSApp.terminate(nil)
             }
         }
-        if CommandLine.arguments.contains("--show-status") || (model.demo && !CommandLine.arguments.contains("--show-hover")) { controller?.showStatus() }
+        let pageFlags = ["--show-settings", "--show-connections", "--show-moments", "--show-share"]
+        let asksForPage = pageFlags.contains(where: CommandLine.arguments.contains)
+        if CommandLine.arguments.contains("--show-status") || (model.demo && !asksForPage && !CommandLine.arguments.contains("--show-hover")) { controller?.showStatus() }
         if CommandLine.arguments.contains("--show-hover") { controller?.showHover() }
-        if ["--show-settings", "--show-connections", "--show-moments"].contains(where: CommandLine.arguments.contains) { controller?.openSettings() }
+        if asksForPage { controller?.openSettings() }
         if let index = CommandLine.arguments.firstIndex(of: "--snapshot-dir"), CommandLine.arguments.count > index + 1 {
             let url = URL(fileURLWithPath: CommandLine.arguments[index + 1])
             var delay = 2.0

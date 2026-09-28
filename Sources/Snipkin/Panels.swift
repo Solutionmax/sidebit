@@ -66,12 +66,9 @@ final class FloatingPanel: NSPanel {
 @MainActor final class CompanionController: NSObject {
     let model: AppModel
     private(set) var petPanel: FloatingPanel!
-    private(set) var statusPanel: FloatingPanel?
     private(set) var settingsPanel: FloatingPanel?
     private var statusItem: NSStatusItem!
     private var subscriptions: Set<AnyCancellable> = []
-    private var clickMonitor: Any?
-    private var statusHeightLimit: CGFloat = 0
     private var hoverPanel: FloatingPanel?
     private var hoverTask: DispatchWorkItem?
     private var pointerOverPet = false
@@ -92,9 +89,6 @@ final class FloatingPanel: NSPanel {
             DispatchQueue.main.async { self?.resizeCards() }
         }.store(in: &subscriptions)
         NotificationCenter.default.addObserver(self, selector: #selector(screensChanged), name: NSApplication.didChangeScreenParametersNotification, object: nil)
-        clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            Task { @MainActor in self?.statusPanel?.orderOut(nil) }
-        }
     }
 
     private func makePanel(key: Bool = false, standard: Bool = false) -> FloatingPanel {
@@ -182,7 +176,7 @@ final class FloatingPanel: NSPanel {
     }
 
     func showHover() {
-        guard statusPanel?.isVisible != true, settingsPanel?.isVisible != true else { return }
+        guard settingsPanel?.isVisible != true else { return }
         if hoverPanel == nil {
             let panel = makePanel()
             panel.title = "Sidebit — quick glance"
@@ -258,7 +252,7 @@ final class FloatingPanel: NSPanel {
     @objc private func menuSettings() { openSettings() }
     @objc private func menuReset() { resetPetPosition() }
     @objc private func menuBoop() { model.boop() }
-    @objc private func menuShare() { ShareCardExporter.exportToday(model: model) }
+    @objc private func menuShare() { openShare(.today) }
     @objc private func menuRecap() { showRecap() }
     @objc private func menuUpdate() { model.checkForUpdates(manual: true); openSettings() }
 
@@ -381,21 +375,12 @@ final class FloatingPanel: NSPanel {
         panel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
-    private var recapPanel: FloatingPanel?
-    func showRecap() {
-        hideHover()
-        model.weekReady = false
-        let panel = recapPanel ?? makePanel(key: true, standard: true)
-        panel.title = "Your week with Bit"
-        panel.titlebarAppearsTransparent = true
-        panel.backgroundColor = .windowBackgroundColor
-        let hosting = NSHostingView(rootView: RecapWindow(model: model))
-        panel.contentView = hosting
-        panel.setContentSize(hosting.fittingSize)
-        if recapPanel == nil { panel.center() }
-        recapPanel = panel
-        panel.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+    /// The week card lives on the Share page now.
+    func showRecap() { openShare(.week) }
+    func openShare(_ kind: ShareKind) {
+        model.settingsTab = SettingsPage.share.rawValue
+        model.settingsShare = kind
+        openSettings()
     }
     @objc private func screensChanged() {
         clampPet()
@@ -403,20 +388,14 @@ final class FloatingPanel: NSPanel {
         resizeCards()
     }
 
+    /// Clicking Bit opens the window on Now; clicking again while it is in front closes it.
     func toggleStatus() {
-        if statusPanel?.isVisible == true { statusPanel?.orderOut(nil) } else { showStatus() }
+        if let panel = settingsPanel, panel.isVisible, panel.isKeyWindow { panel.orderOut(nil) } else { showStatus() }
     }
 
     func showStatus() {
-        hideHover()
-        if statusPanel == nil {
-            let panel = makePanel(key: true)
-            panel.title = "Sidebit — sessions"
-            statusPanel = panel
-        }
-        resizeCards()
-        positionStatus()
-        statusPanel?.makeKeyAndOrderFront(nil)
+        model.settingsTab = SettingsPage.now.rawValue
+        openSettings()
     }
 
     func openSettings() {
@@ -425,6 +404,8 @@ final class FloatingPanel: NSPanel {
         if settingsPanel == nil {
             let panel = makePanel(key: true, standard: true)
             panel.title = "Sidebit — settings"
+            panel.styleMask.insert(.fullSizeContentView)
+            panel.titleVisibility = .hidden
             panel.titlebarAppearsTransparent = true
             panel.backgroundColor = .windowBackgroundColor
             panel.setFrameAutosaveName("SnipkinSettings")
@@ -435,22 +416,18 @@ final class FloatingPanel: NSPanel {
         rebuildSettingsContent()
         clampSettings()
         settingsPanel?.makeKeyAndOrderFront(nil)
-        DispatchQueue.main.async { [weak self] in self?.model.settingsTab = nil }
+        DispatchQueue.main.async { [weak self] in self?.model.settingsTab = nil; self?.model.settingsShare = nil }
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    private static let settingsSize = NSSize(width: 1040, height: 660)
     private func rebuildSettingsContent() {
         guard let panel = settingsPanel else { return }
-        let available = ((panel.screen ?? NSScreen.main)?.visibleFrame.height ?? 900) - 55
-        panel.contentView = NSHostingView(rootView:
-            FittedPanelContent(maximumHeight: available, onResize: { [weak panel, weak self] height in
-                panel?.setContentSize(NSSize(width: 420, height: height))
-                self?.clampSettings()
-            }) { [model, weak self] in
-                SettingsCard(model: model, close: { [weak self] in self?.settingsPanel?.orderOut(nil) })
-            }
-        )
-        panel.setContentSize(NSSize(width: 420, height: min(600, available)))
+        let bounds = (panel.screen ?? NSScreen.main)?.visibleFrame.size ?? Self.settingsSize
+        let hosting = NSHostingView(rootView: SettingsCard(model: model, close: { [weak self] in self?.settingsPanel?.orderOut(nil) }))
+        hosting.sizingOptions = []  // The window keeps its fixed size; pages scroll inside it.
+        panel.contentView = hosting
+        panel.setContentSize(NSSize(width: min(Self.settingsSize.width, bounds.width - 20), height: min(Self.settingsSize.height, bounds.height - 20)))
     }
 
     private func clampSettings() {
@@ -497,41 +474,20 @@ final class FloatingPanel: NSPanel {
         updateToast()
         updateNotch()
         positionHover()
-        if let statusPanel {
-            let limit = ((petPanel.screen ?? NSScreen.main)?.visibleFrame.height ?? 900) - 55
-            if statusHeightLimit != limit {
-                statusHeightLimit = limit
-                statusPanel.contentView = NSHostingView(rootView:
-                    FittedPanelContent(maximumHeight: limit, onResize: { [weak statusPanel] height in
-                        statusPanel?.setContentSize(NSSize(width: 420, height: height))
-                    }) { [model] in StatusCard(model: model) }
-                )
-            }
-        }
-
-    }
-
-    private func positionStatus() {
-        guard let statusPanel, let petPanel else { return }
-        let bounds = (petPanel.screen ?? NSScreen.main)?.visibleFrame ?? .zero
-        let x = min(max(petPanel.frame.midX - statusPanel.frame.width / 2, bounds.minX + 10), bounds.maxX - statusPanel.frame.width - 10)
-        let above = petPanel.frame.maxY + 6
-        let y = above + statusPanel.frame.height <= bounds.maxY ? above : max(bounds.minY + 10, petPanel.frame.minY - statusPanel.frame.height - 6)
-        statusPanel.setFrameOrigin(NSPoint(x: x, y: y))
     }
 
     // Development-only native view captures. No desktop pixels or other apps are read.
     func captureViews(to directory: URL) {
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            for (name, panel) in [("pet", petPanel), ("status", statusPanel), ("settings", settingsPanel), ("hover", hoverPanel)] {
+            for (name, panel) in [("pet", petPanel), ("settings", settingsPanel), ("hover", hoverPanel)] {
                 guard let view = panel?.contentView, let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { continue }
                 view.cacheDisplay(in: view.bounds, to: rep)
                 if let data = rep.representation(using: .png, properties: [:]) { try data.write(to: directory.appendingPathComponent("\(name).png")) }
             }
-            let cards: [(String, NSImage?)] = [("share", ShareCardExporter.render(ShareCardExporter.todayCard(model: model))),
-                                               ("recap", ShareCardExporter.render(RecapCard(week: model.week, streak: model.streak, medals: model.unlockedMoments.count, end: model.now))),
-                                               ("medal-card", ShareCardExporter.render(MedalCard(moment: .juggler, date: model.now, number: 7))),
+            let cards: [(String, NSImage?)] = [("share", ShareCardExporter.render(ShareCardExporter.todayCard(model: model), scale: 2)),
+                                               ("recap", ShareCardExporter.render(RecapCard(week: model.week, streak: model.streak, medals: model.unlockedMoments.count, end: model.now), scale: 2)),
+                                               ("medal-card", ShareCardExporter.render(MedalCard(moment: .juggler, date: model.now, number: 7), scale: 2)),
                                                ("menubar", ShareCardExporter.render(HStack(spacing: 24) { ForEach([BitGlyph.Eyes.open, .closed, .wide, .star], id: \.self) { Image(nsImage: BitGlyph.image($0, tint: $0 == .wide ? .systemOrange : .white)).resizable().frame(width: 72, height: 72) } }.padding(20).background(Color.black))),
                                                ("toast", ShareCardExporter.render(MomentToast(moment: .juggler, count: 1, time: 4))),
                                                ("toast-small", ShareCardExporter.render(MomentToast(moment: .juggler, count: 1, time: 4, scale: 0.62))),

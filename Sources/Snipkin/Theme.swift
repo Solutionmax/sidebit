@@ -25,13 +25,14 @@ let peach = rgb(0x1C1C1F)
 extension Font {
     static func geist(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font { .custom("Geist", size: size).weight(weight) }
     static func mono(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font { .custom("Geist Mono", size: size).weight(weight) }
-    static func serif(_ size: CGFloat, italic: Bool = false) -> Font { .custom(italic ? "InstrumentSerif-Italic" : "InstrumentSerif-Regular", size: size) }
+    /// Display type. Geist is wider than the serif it replaced, so sizes shrink a little to keep layouts intact.
+    static func display(_ size: CGFloat) -> Font { .custom("Geist", size: size * 0.84).weight(.medium) }
 }
 
 /// Bundled OFL fonts, registered for this process only. Missing files fall back to the system font.
 enum Fonts {
     static func register() {
-        for name in ["Geist", "GeistMono", "InstrumentSerif-Regular", "InstrumentSerif-Italic"] {
+        for name in ["Geist", "GeistMono"] {
             guard let url = Bundle.module.url(forResource: name, withExtension: "ttf", subdirectory: "Resources/Fonts") else { continue }
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
@@ -101,6 +102,7 @@ struct Medal: View {
     let moment: Moment
     var unlocked = true
     var size: CGFloat = 46
+    var glint = false
     var body: some View {
         let m = moment.rarity.metal
         ZStack {
@@ -123,11 +125,14 @@ struct Medal: View {
                 // Specular sheen.
                 Ellipse().fill(LinearGradient(colors: [.white.opacity(0.55), .white.opacity(0)], startPoint: .top, endPoint: .bottom))
                     .frame(width: size * 0.62, height: size * 0.34).offset(x: -size * 0.1, y: -size * 0.22).blendMode(.screen).allowsHitTesting(false)
+                if glint { GlintSweep(delay: Double(Moment.allCases.firstIndex(of: moment) ?? 0) * 0.9).clipShape(Circle()) }
             } else {
-                Circle().fill(Color.white.opacity(0.03))
-                Circle().strokeBorder(Color.white.opacity(0.09), lineWidth: 1)
-                Circle().strokeBorder(Color.white.opacity(0.05), style: StrokeStyle(lineWidth: 1, dash: [2, 3])).padding(size * 0.1)
-                Image(systemName: "lock.fill").font(.system(size: size * 0.24)).foregroundStyle(faint.opacity(0.6))
+                // Blind stamp: the real glyph, barely there, inside a rim tinted by its metal.
+                let rim = moment.rarity == .obsidian ? accent : m[1]
+                Circle().fill(Color.white.opacity(0.025))
+                Circle().strokeBorder(rim.opacity(0.32), lineWidth: max(1, size * 0.03))
+                Circle().strokeBorder(rim.opacity(0.14), style: StrokeStyle(lineWidth: 1, dash: [2, 3])).padding(size * 0.12)
+                glyph.foregroundStyle(moment.rarity == .obsidian ? accent.opacity(0.22) : Color.white.opacity(0.11))
             }
         }
         .frame(width: size, height: size)
