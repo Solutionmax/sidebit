@@ -14,7 +14,13 @@ ditto "$build_dir/Snipkin_Snipkin.bundle" "$app/Contents/Resources/Snipkin_Snipk
 if [ -f Sources/Snipkin/Resources/AppIcon.icns ]; then
     cp Sources/Snipkin/Resources/AppIcon.icns "$app/Contents/Resources/AppIcon.icns"
 fi
-codesign --force --sign - "$app"
+# A stable identity keeps macOS privacy grants (Accessibility) across updates; ad-hoc pins them to one build.
+if [ -n "${SIDEBIT_SIGN_IDENTITY:-}" ]; then
+    codesign --force --sign "$SIDEBIT_SIGN_IDENTITY" "$app"
+else
+    echo "warning: SIDEBIT_SIGN_IDENTITY not set, signing ad-hoc (Accessibility grant resets every build)" >&2
+    codesign --force --sign - "$app"
+fi
 codesign --verify --deep --strict "$app"
 version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" Info.plist)"
 grep -q "current = \"$version\"" Sources/SnipkinCore/Usage.swift || { echo "Version mismatch: Info.plist $version vs SidebitVersion" >&2; exit 1; }

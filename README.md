@@ -151,7 +151,7 @@ Network requests are limited to: your allowance from `api.anthropic.com` or `cha
 
 **Codex shows nothing.** Run `/hooks` in Codex and trust the Sidebit hooks.
 
-**macOS keeps asking about Accessibility.** Beta builds are signed ad hoc, so macOS sees each update as a new app. Toggle Sidebit off and on in *Privacy & Security → Accessibility*.
+**Bit stopped following Claude Desktop after an update.** From 0.7.0 beta 2 Sidebit is signed with a stable certificate, so macOS keeps the Accessibility permission across updates. Coming from beta 1, do this once: in *Privacy & Security → Accessibility* remove Sidebit with **–**, add it again with **+**, then restart Sidebit. Toggling is not enough.
 
 **How do I remove it?** Settings → Connections → Disconnect both agents, quit, and delete the app. Your data folder is listed above.
 

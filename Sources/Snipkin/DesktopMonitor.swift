@@ -54,13 +54,23 @@ import SnipkinCore
                 let now = Date()
                 let sessions = values.map { value -> Session in
                     let state = value.activity
-                    let detail = !trusted ? "Accessibility permission required" : state == .unknown ? "App open · status unavailable" : "Observed desktop controls · experimental"
+                    let detail = !trusted ? "Accessibility permission required" : Self.detail(for: state)
                     return Session(sessionID: "desktop:\(value.app.bundle)", provider: value.app.provider,
                                    cwd: value.app.title + " Desktop", activity: state, detail: detail,
                                    updatedAt: now, pid: value.app.pid, appBundlePath: value.app.path)
                 }
                 self.receive?(sessions, trusted)
             }
+        }
+    }
+
+    /// Buttons only tell us the state, never the task, so the bubble says what Bit can honestly know.
+    nonisolated static func detail(for activity: Activity) -> String {
+        switch activity {
+        case .working, .thinking: return "Working on it"
+        case .waiting: return "Needs your approval"
+        case .idle, .done: return "Ready"
+        case .unknown: return "App open · status unavailable"
         }
     }
 

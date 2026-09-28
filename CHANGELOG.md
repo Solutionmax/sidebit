@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0-beta.2
+
+- **Accessibility permission now survives updates.** Sidebit is signed with a stable certificate instead of ad hoc, so following Claude Desktop chat and Cowork keeps working after an update. Coming from beta 1, remove Sidebit in *Privacy & Security → Accessibility* and add it again, once.
+- **Plain status for Claude Desktop.** Bit's bubble now says *Working on it*, *Needs your approval* or *Ready* for desktop chat and Cowork.
+- **Bit speaks up sooner.** The speech bubble also appears in the first seconds of a new state, so short desktop replies show it too.
+
 ## 0.7.0-beta.1
 
 Obsidian.

@@ -31,7 +31,8 @@ struct CharacterScene {
     func showsQuip(at time: Double) -> Bool {
         if gag { return (3...7).contains(time) || (11...15).contains(time) }
         let p = phase(at: time)
-        return (17...22).contains(p) || (35...39).contains(p)
+        // Early window too: short desktop replies often end before second 17.
+        return (1.5...6.5).contains(p) || (17...22).contains(p) || (35...39).contains(p)
     }
 
     func motion(at time: Double, frozen: Bool) -> Motion {

@@ -212,7 +212,7 @@ public struct UsageReader: Sendable {
     }
 }
 
-public enum SidebitVersion { public static let current = "0.7.0-beta.1" }
+public enum SidebitVersion { public static let current = "0.7.0-beta.2" }
 
 /// Last known allowance per provider, so a relaunch or a failed refresh never shows an empty card.
 public struct UsageStore: Sendable {
