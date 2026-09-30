@@ -235,7 +235,8 @@ final class FloatingPanel: NSPanel {
             ("Your week with Bit…", #selector(menuRecap), ""),
             ("Check for Updates…", #selector(menuUpdate), ""),
             ("Settings…", #selector(menuSettings), ","),
-            ("Reset position", #selector(menuReset), "")
+            ("Reset position", #selector(menuReset), ""),
+            ("Buy Me a Coffee…", #selector(menuCoffee), "")
         ]
         for (title, action, key) in items {
             let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
@@ -254,6 +255,7 @@ final class FloatingPanel: NSPanel {
     @objc private func menuBoop() { model.boop() }
     @objc private func menuShare() { openShare(.today) }
     @objc private func menuRecap() { showRecap() }
+    @objc private func menuCoffee() { NSWorkspace.shared.open(URL(string: "https://buymeacoffee.com/solutionmax")!) }
     @objc private func menuUpdate() { model.checkForUpdates(manual: true); openSettings() }
 
     // MARK: Notch alert
